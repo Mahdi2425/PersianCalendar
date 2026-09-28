@@ -9,7 +9,7 @@ namespace PersianCalendar.Services
     /// <summary>
     /// In-memory implementation of IEventService.
     /// Stores events in a thread-safe dictionary and queries by date range.
-    /// </summary>
+    /// </summary> ///
     public class EventService : BaseService, IEventService
     {
         private readonly Dictionary<Guid, Event> _store = new();
