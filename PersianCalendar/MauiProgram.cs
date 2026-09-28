@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using PersianCalendar.Services;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using PersianCalendar.Persistence.Configurations;
 
 namespace PersianCalendar
 {
@@ -15,6 +16,12 @@ namespace PersianCalendar
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 });
 
+            using var settingsFile = FileSystem.OpenAppPackageFileAsync("appsettings.json").GetAwaiter().GetResult();
+            var settingsCopy = new MemoryStream();
+            settingsFile.CopyTo(settingsCopy);
+            settingsCopy.Position = 0;
+            builder.Configuration.AddJsonStream(settingsCopy);
+
             builder.Services.AddMauiBlazorWebView();
 
 #if DEBUG
@@ -22,14 +29,7 @@ namespace PersianCalendar
             builder.Logging.AddDebug();
 #endif
 
-            // ---- Domain services (interfaces + implementations) ----
-            builder.Services.AddScoped<ICalendarService, CalendarService>();
-            builder.Services.AddScoped<IEventService, EventService>();
-            builder.Services.AddScoped<ICategoryService, CategoryService>();
-            builder.Services.AddScoped<IHolidayService, HolidayService>();
-            builder.Services.AddScoped<IReminderService, ReminderService>();
-            builder.Services.AddScoped<IPersianDateService, PersianDateService>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.ConfigurePersistenceServices(builder.Configuration);
 
             return builder.Build();
         }
